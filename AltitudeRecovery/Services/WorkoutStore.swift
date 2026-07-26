@@ -9,6 +9,7 @@ final class WorkoutStore {
 
     @ObservationIgnored private let fileManager: FileManager
     @ObservationIgnored private let fileURL: URL
+    @ObservationIgnored var onWorkoutsChanged: (([Workout]) -> Void)?
 
     init(fileManager: FileManager = .default) {
         self.fileManager = fileManager
@@ -64,9 +65,9 @@ final class WorkoutStore {
             let data = try JSONEncoder().encode(workouts)
             try data.write(to: fileURL, options: .atomic)
             lastErrorMessage = nil
+            onWorkoutsChanged?(workouts)
         } catch {
             lastErrorMessage = error.localizedDescription
         }
     }
 }
-

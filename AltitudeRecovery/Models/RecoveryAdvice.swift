@@ -16,11 +16,16 @@ struct RecoveryAdvice: Equatable {
         systemImage: "location"
     )
 
-    static func make(location: CLLocation) -> RecoveryAdvice {
+    static func make(
+        location: CLLocation,
+        resolvedLocationName: String? = nil
+    ) -> RecoveryAdvice {
         let knownPlace = KnownPlace.nearest(to: location.coordinate)
         let altitude = knownPlace?.altitudeMeters
             ?? max(0, Int(location.altitude.rounded()))
-        let place = knownPlace?.name ?? location.coordinate.shortDescription
+        let place = knownPlace?.name
+            ?? resolvedLocationName
+            ?? "Finding location name…"
 
         switch altitude {
         case 1_500...:
@@ -48,6 +53,12 @@ struct RecoveryAdvice: Equatable {
                 systemImage: "checkmark.circle.fill"
             )
         }
+    }
+
+    static func knownLocationName(
+        for coordinate: CLLocationCoordinate2D
+    ) -> String? {
+        KnownPlace.nearest(to: coordinate)?.name
     }
 }
 
@@ -98,11 +109,5 @@ private struct KnownPlace {
 
     private var location: CLLocation {
         CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-    }
-}
-
-private extension CLLocationCoordinate2D {
-    var shortDescription: String {
-        String(format: "%.2f°, %.2f°", latitude, longitude)
     }
 }

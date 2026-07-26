@@ -7,7 +7,7 @@ struct RecoveryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Label("Recovery Advice", systemImage: advice.systemImage)
+                Label("Device Hub Location", systemImage: advice.systemImage)
                     .font(.headline)
                     .foregroundStyle(.indigo)
 
@@ -28,6 +28,13 @@ struct RecoveryCard: View {
             Text(advice.recommendation)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
+
+            Label(
+                "Change Location in Device Hub to update this card",
+                systemImage: "location.fill.viewfinder"
+            )
+            .font(.caption)
+            .foregroundStyle(.indigo)
 
             Label(
                 isWideLayout ? "Landscape layout" : "Portrait layout",

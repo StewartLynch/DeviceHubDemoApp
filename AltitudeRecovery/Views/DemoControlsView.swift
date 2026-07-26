@@ -19,40 +19,38 @@ struct DemoControlsView: View {
                     }
                 }
 
-                Section("Location") {
-                    LabeledContent("Current place", value: model.location.advice.locationName)
-                    LabeledContent("Altitude", value: "\(model.location.advice.altitudeMeters) m")
-
-                    Label(
-                        isJohannesburgReady ? "Johannesburg ready" : "Johannesburg not active",
-                        systemImage: isJohannesburgReady
-                            ? "checkmark.circle.fill"
-                            : "location.circle"
+                Section {
+                    LabeledContent(
+                        "Detected place",
+                        value: model.location.advice.locationName
                     )
-                    .foregroundStyle(isJohannesburgReady ? .green : .orange)
+                    LabeledContent(
+                        "Altitude",
+                        value: "\(model.location.advice.altitudeMeters) m"
+                    )
 
-                    if let error = model.location.errorMessage {
-                        Text(error)
-                            .font(.footnote)
+                    LabeledContent(
+                        "Recovery mode",
+                        value: model.location.advice.headline
+                    )
+
+                    if let errorMessage = model.location.errorMessage {
+                        Text(errorMessage)
                             .foregroundStyle(.red)
-                    } else {
-                        Text("Use Device Hub to simulate Johannesburg, then return to Today.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
                     }
-                }
-
-                Section("Device Hub Checklist") {
-                    RecipeStep(number: 1, text: "Simulate Johannesburg")
-                    RecipeStep(number: 2, text: "Try portrait and landscape")
-                    RecipeStep(number: 3, text: "Change appearance")
-                    RecipeStep(number: 4, text: "Change text size")
-                    RecipeStep(number: 5, text: "Compare another device")
+                } header: {
+                    Text("Device Hub Location")
+                } footer: {
+                    Text(
+                        "In Device Hub, select this iPhone and change Location. "
+                            + "These values, the Today card, and the paired Watch "
+                            + "update when Core Location reports the new position."
+                    )
                 }
             }
             .navigationTitle("Demo Controls")
             .confirmationDialog(
-                "Reset the Device Hub demo?",
+                "Reset sample data?",
                 isPresented: $showsResetConfirmation,
                 titleVisibility: .visible
             ) {
@@ -62,28 +60,5 @@ struct DemoControlsView: View {
                 Text("This restores the four sample workouts.")
             }
         }
-    }
-
-    private var isJohannesburgReady: Bool {
-        model.location.advice.locationName == "Johannesburg"
-            && model.location.advice.altitudeMeters >= 1_500
-    }
-}
-
-private struct RecipeStep: View {
-    let number: Int
-    let text: String
-
-    var body: some View {
-        Label {
-            Text(text)
-        } icon: {
-            Text("\(number)")
-                .font(.caption.bold())
-                .frame(width: 24, height: 24)
-                .background(.indigo.opacity(0.15), in: Circle())
-                .foregroundStyle(.indigo)
-        }
-        .accessibilityElement(children: .combine)
     }
 }
