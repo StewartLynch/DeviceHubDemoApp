@@ -25,6 +25,10 @@ struct DemoControlsView: View {
                         value: model.location.advice.locationName
                     )
                     LabeledContent(
+                        "Source",
+                        value: model.location.sourceDescription
+                    )
+                    LabeledContent(
                         "Altitude",
                         value: "\(model.location.advice.altitudeMeters) m"
                     )
@@ -38,13 +42,21 @@ struct DemoControlsView: View {
                         Text(errorMessage)
                             .foregroundStyle(.red)
                     }
+
+                    Button(
+                        "Refresh Location",
+                        systemImage: "location.fill.viewfinder",
+                        action: model.location.refresh
+                    )
                 } header: {
                     Text("Device Hub Location")
                 } footer: {
                     Text(
                         "In Device Hub, select this iPhone and change Location. "
                             + "These values, the Today card, and the paired Watch "
-                            + "update when Core Location reports the new position."
+                            + "update when Core Location reports the new position. "
+                            + "After choosing None, Refresh Location requests a "
+                            + "new fix from the device GPS."
                     )
                 }
             }

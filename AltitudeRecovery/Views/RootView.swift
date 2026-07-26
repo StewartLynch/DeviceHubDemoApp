@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RootView: View {
     let model: AppModel
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         TabView {
@@ -20,6 +21,11 @@ struct RootView: View {
         .tint(.indigo)
         .task {
             model.location.start()
+        }
+        .onChange(of: scenePhase) {
+            if scenePhase == .active {
+                model.location.refresh()
+            }
         }
     }
 }

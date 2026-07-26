@@ -63,6 +63,8 @@ private struct WorkoutRow: View {
 
             VStack(alignment: .trailing, spacing: 4) {
                 Text("\(workout.durationMinutes) min")
+                Text(workout.formattedDistance)
+                    .foregroundStyle(.secondary)
                 Text("↗ \(workout.elevationGainMeters) m")
                     .foregroundStyle(.secondary)
             }
@@ -71,4 +73,3 @@ private struct WorkoutRow: View {
         .accessibilityElement(children: .combine)
     }
 }
-

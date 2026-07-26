@@ -2,12 +2,13 @@
 
 Altitude Recovery is a small SwiftUI app built for demonstrating Device Hub and `devicectl` workflows.
 
-The project also includes an **AltitudeRecovery Watch App** target. The iPhone app sends an app snapshot through WatchConnectivity containing both its current workout list and its location-derived recovery advice. The Watch caches the latest snapshot. From the recovery summary, you can see the same detected place and altitude, then open the synchronized workouts and drill into duration, elevation gain, and date details.
+The project also includes an **AltitudeRecovery Watch App** target. The iPhone app sends an app snapshot through WatchConnectivity containing both its current workout list and its location-derived recovery advice. The Watch caches the latest snapshot. From the recovery summary, you can see the same detected place and altitude, then open the synchronized workouts and drill into duration, distance, elevation gain, and date details.
 
 ## What the app demonstrates
 
 - Persistent workout data stored in the app's Application Support container
 - Adding, deleting, resetting, exporting, and restoring meaningful app state
+- Entering workout distance in either kilometres or metres
 - Live Core Location updates, including simulated locations and altitude
 - Location-sensitive recovery advice that changes for Johannesburg and other known cities
 - Responsive portrait and landscape layouts
@@ -45,6 +46,8 @@ The project targets iOS 18 or later. It can be built with Xcode 26 and is intend
 The recommendation remains fully readable at every text size. The point of this sequence is to demonstrate how quickly Device Hub can mirror and compare configurations.
 
 Device Hub changes the iPhone's simulated Core Location position; it does not directly configure the Watch app. The running iPhone app converts the Core Location update into recovery advice and sends that result to its paired Watch through WatchConnectivity. Keep the iPhone app running or bring it back to the foreground after changing the location, then allow a moment for the Watch's **Synced** status and recovery values to refresh.
+
+To return a physical iPhone to its real position, choose **None** in Device Hub. The Demo screen changes its source from **Device Hub simulation** to **Waiting for device GPS**, then to **Device GPS** when Core Location supplies a fresh fix. If the fix does not arrive immediately, tap **Refresh Location**. A simulator has no real GPS position, so choosing None there leaves the app waiting until another simulated location is selected.
 
 ## App-container demonstration
 

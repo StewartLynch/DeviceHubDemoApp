@@ -30,6 +30,17 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         )
     }
 
+    var sourceDescription: String {
+        guard let currentLocation else {
+            return "Waiting for device GPS"
+        }
+
+        if currentLocation.sourceInformation?.isSimulatedBySoftware == true {
+            return "Device Hub simulation"
+        }
+        return "Device GPS"
+    }
+
     func start() {
         switch authorizationStatus {
         case .notDetermined:
@@ -41,6 +52,22 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         @unknown default:
             break
         }
+    }
+
+    func refresh() {
+        guard authorizationStatus == .authorizedAlways
+                || authorizationStatus == .authorizedWhenInUse
+        else {
+            start()
+            return
+        }
+
+        if currentLocation?.sourceInformation?.isSimulatedBySoftware == true {
+            clearLocation()
+        }
+
+        manager.stopUpdatingLocation()
+        manager.startUpdatingLocation()
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -60,8 +87,24 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         let locationError = error as? CLError
-        guard locationError?.code != .locationUnknown else { return }
+
+        if locationError?.code == .locationUnknown {
+            if currentLocation?.sourceInformation?.isSimulatedBySoftware == true {
+                clearLocation()
+            }
+            return
+        }
+
         errorMessage = error.localizedDescription
+    }
+
+    private func clearLocation() {
+        geocodingTask?.cancel()
+        geocoder.cancelGeocode()
+        currentLocation = nil
+        resolvedLocationName = nil
+        lastGeocodedLocation = nil
+        onLocationChanged?(nil)
     }
 
     private func updateLocationName(for location: CLLocation) {

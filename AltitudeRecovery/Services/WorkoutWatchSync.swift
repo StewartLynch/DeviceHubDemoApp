@@ -15,6 +15,7 @@ final class WorkoutWatchSync {
                 date: $0.date,
                 activity: $0.activity.rawValue,
                 durationMinutes: $0.durationMinutes,
+                distanceMeters: $0.distanceMeters,
                 elevationGainMeters: $0.elevationGainMeters
             )
         }

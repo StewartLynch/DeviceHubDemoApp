@@ -37,7 +37,7 @@ private struct WatchWorkoutRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(workout.activity)
                     .font(.headline)
-                Text("\(workout.durationMinutes) min · \(workout.elevationGainMeters) m")
+                Text("\(workout.durationMinutes) min · \(workout.formattedDistance)")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -62,6 +62,10 @@ private struct WatchWorkoutDetailView: View {
                 detailRow(
                     title: "Duration",
                     value: "\(workout.durationMinutes) minutes"
+                )
+                detailRow(
+                    title: "Distance",
+                    value: workout.formattedDistance
                 )
                 detailRow(
                     title: "Elevation",
