@@ -43,20 +43,21 @@ struct DemoControlsView: View {
                             .foregroundStyle(.red)
                     }
 
+#if !targetEnvironment(simulator)
                     Button(
                         "Refresh Location",
                         systemImage: "location.fill.viewfinder",
                         action: model.location.refresh
                     )
+#endif
                 } header: {
-                    Text("Device Hub Location")
+                    Text(model.location.source.title)
                 } footer: {
                     Text(
                         "In Device Hub, select this iPhone and change Location. "
                             + "These values, the Today card, and the paired Watch "
                             + "update when Core Location reports the new position. "
-                            + "After choosing None, Refresh Location requests a "
-                            + "new fix from the device GPS."
+                            + locationFooter
                     )
                 }
             }
@@ -72,5 +73,13 @@ struct DemoControlsView: View {
                 Text("This restores the four sample workouts.")
             }
         }
+    }
+
+    private var locationFooter: String {
+#if targetEnvironment(simulator)
+        "On a simulator, None means no location. Select a preset or custom location."
+#else
+        "After choosing None, Refresh Location requests a new fix from the device GPS."
+#endif
     }
 }

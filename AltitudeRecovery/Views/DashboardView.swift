@@ -10,6 +10,7 @@ struct DashboardView: View {
                     DashboardContentView(
                         workouts: model.workouts.workouts,
                         advice: model.location.advice,
+                        locationSource: model.location.source,
                         isWideLayout: geometry.size.width > geometry.size.height
                     )
                     .padding()
@@ -24,6 +25,7 @@ struct DashboardView: View {
 private struct DashboardContentView: View {
     let workouts: [Workout]
     let advice: RecoveryAdvice
+    let locationSource: LocationService.Source
     let isWideLayout: Bool
 
     var body: some View {
@@ -34,6 +36,7 @@ private struct DashboardContentView: View {
 
                 RecoveryCard(
                     advice: advice,
+                    locationSource: locationSource,
                     isWideLayout: true
                 )
                 .frame(maxWidth: .infinity)
@@ -44,6 +47,7 @@ private struct DashboardContentView: View {
 
                 RecoveryCard(
                     advice: advice,
+                    locationSource: locationSource,
                     isWideLayout: false
                 )
             }

@@ -4,6 +4,53 @@ import Observation
 @Observable
 @MainActor
 final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate {
+    enum Source: Equatable {
+        case unavailable
+        case deviceHub
+        case deviceGPS
+
+        var title: String {
+            switch self {
+            case .deviceHub:
+                "Device Hub Location"
+            case .deviceGPS:
+                "Current Location"
+            case .unavailable:
+#if targetEnvironment(simulator)
+                "Device Hub Location"
+#else
+                "Current Location"
+#endif
+            }
+        }
+
+        var guidance: String {
+            switch self {
+            case .deviceHub:
+                "Change Location in Device Hub to update this card"
+            case .deviceGPS:
+                "Using this iPhone’s current GPS location"
+            case .unavailable:
+#if targetEnvironment(simulator)
+                "Select a location in Device Hub to update this card"
+#else
+                "Waiting for this iPhone’s current GPS location"
+#endif
+            }
+        }
+
+        var guidanceSystemImage: String {
+            switch self {
+            case .deviceHub:
+                "location.fill.viewfinder"
+            case .deviceGPS:
+                "location.fill"
+            case .unavailable:
+                "location.slash"
+            }
+        }
+    }
+
     private(set) var currentLocation: CLLocation?
     private(set) var authorizationStatus: CLAuthorizationStatus
     private(set) var errorMessage: String?
@@ -14,6 +61,10 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     @ObservationIgnored private var geocodingTask: Task<Void, Never>?
     @ObservationIgnored private var lastGeocodedLocation: CLLocation?
     @ObservationIgnored var onLocationChanged: ((CLLocation?) -> Void)?
+#if targetEnvironment(simulator)
+    @ObservationIgnored private var simulatorProbeTask: Task<Void, Never>?
+    @ObservationIgnored private var simulatorRequestStartedAt: Date?
+#endif
 
     override init() {
         authorizationStatus = manager.authorizationStatus
@@ -23,22 +74,45 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
     }
 
     var advice: RecoveryAdvice {
-        guard let currentLocation else { return .waiting }
+        guard let currentLocation else {
+#if targetEnvironment(simulator)
+            return .noSimulatedLocation
+#else
+            return .waiting
+#endif
+        }
         return RecoveryAdvice.make(
             location: currentLocation,
             resolvedLocationName: resolvedLocationName
         )
     }
 
-    var sourceDescription: String {
-        guard let currentLocation else {
-            return "Waiting for device GPS"
-        }
+    var source: Source {
+        guard let currentLocation else { return .unavailable }
 
+#if targetEnvironment(simulator)
+        return .deviceHub
+#else
         if currentLocation.sourceInformation?.isSimulatedBySoftware == true {
-            return "Device Hub simulation"
+            return .deviceHub
         }
-        return "Device GPS"
+        return .deviceGPS
+#endif
+    }
+
+    var sourceDescription: String {
+        switch source {
+        case .unavailable:
+#if targetEnvironment(simulator)
+            return "No simulated location"
+#else
+            return "Waiting for device GPS"
+#endif
+        case .deviceHub:
+            return "Device Hub simulation"
+        case .deviceGPS:
+            return "Device GPS"
+        }
     }
 
     func start() {
@@ -46,7 +120,7 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         case .notDetermined:
             manager.requestWhenInUseAuthorization()
         case .authorizedAlways, .authorizedWhenInUse:
-            manager.startUpdatingLocation()
+            startLocationUpdates()
         case .denied, .restricted:
             errorMessage = "Location access is off. Enable it in Settings to use Device Hub location simulation."
         @unknown default:
@@ -62,27 +136,36 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
             return
         }
 
+#if !targetEnvironment(simulator)
         if currentLocation?.sourceInformation?.isSimulatedBySoftware == true {
             clearLocation()
         }
 
         manager.stopUpdatingLocation()
         manager.startUpdatingLocation()
+#endif
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
         if authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse {
-            manager.startUpdatingLocation()
+            startLocationUpdates()
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        currentLocation = location
-        errorMessage = nil
-        updateLocationName(for: location)
-        onLocationChanged?(location)
+
+#if targetEnvironment(simulator)
+        guard let simulatorRequestStartedAt,
+              location.timestamp >= simulatorRequestStartedAt.addingTimeInterval(-0.5)
+        else {
+            clearLocation()
+            return
+        }
+#endif
+
+        receive(location)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -98,13 +181,73 @@ final class LocationService: NSObject, @preconcurrency CLLocationManagerDelegate
         errorMessage = error.localizedDescription
     }
 
+    private func receive(_ location: CLLocation) {
+        let isMeaningfulChange = isMeaningfulChange(to: location)
+        currentLocation = location
+        errorMessage = nil
+        updateLocationName(for: location)
+        if isMeaningfulChange {
+            onLocationChanged?(location)
+        }
+    }
+
+    private func startLocationUpdates() {
+#if targetEnvironment(simulator)
+        startSimulatorProbes()
+#else
+        manager.startUpdatingLocation()
+#endif
+    }
+
+#if targetEnvironment(simulator)
+    private func startSimulatorProbes() {
+        guard simulatorProbeTask == nil else { return }
+
+        simulatorProbeTask = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self else { return }
+
+                simulatorRequestStartedAt = Date()
+                manager.requestLocation()
+
+                do {
+                    try await Task.sleep(for: .seconds(2))
+                } catch {
+                    return
+                }
+            }
+        }
+    }
+#endif
+
     private func clearLocation() {
+        guard currentLocation != nil
+                || resolvedLocationName != nil
+                || lastGeocodedLocation != nil
+        else {
+            return
+        }
+
         geocodingTask?.cancel()
         geocoder.cancelGeocode()
         currentLocation = nil
         resolvedLocationName = nil
         lastGeocodedLocation = nil
         onLocationChanged?(nil)
+    }
+
+    private func isMeaningfulChange(to location: CLLocation) -> Bool {
+        guard let currentLocation else { return true }
+
+        let sourceChanged =
+            currentLocation.sourceInformation?.isSimulatedBySoftware
+            != location.sourceInformation?.isSimulatedBySoftware
+        let altitudeChanged =
+            abs(currentLocation.altitude - location.altitude) >= 1
+        let positionChanged =
+            currentLocation.distance(from: location) >= 1
+
+        return sourceChanged || altitudeChanged || positionChanged
     }
 
     private func updateLocationName(for location: CLLocation) {

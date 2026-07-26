@@ -2,12 +2,16 @@ import SwiftUI
 
 struct RecoveryCard: View {
     let advice: RecoveryAdvice
+    let locationSource: LocationService.Source
     let isWideLayout: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Label("Device Hub Location", systemImage: advice.systemImage)
+                Label(
+                    locationSource.title,
+                    systemImage: advice.systemImage
+                )
                     .font(.headline)
                     .foregroundStyle(.indigo)
 
@@ -30,8 +34,8 @@ struct RecoveryCard: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             Label(
-                "Change Location in Device Hub to update this card",
-                systemImage: "location.fill.viewfinder"
+                locationSource.guidance,
+                systemImage: locationSource.guidanceSystemImage
             )
             .font(.caption)
             .foregroundStyle(.indigo)

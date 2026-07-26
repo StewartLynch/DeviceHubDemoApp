@@ -47,7 +47,11 @@ The recommendation remains fully readable at every text size. The point of this 
 
 Device Hub changes the iPhone's simulated Core Location position; it does not directly configure the Watch app. The running iPhone app converts the Core Location update into recovery advice and sends that result to its paired Watch through WatchConnectivity. Keep the iPhone app running or bring it back to the foreground after changing the location, then allow a moment for the Watch's **Synced** status and recovery values to refresh.
 
-To return a physical iPhone to its real position, choose **None** in Device Hub. The Demo screen changes its source from **Device Hub simulation** to **Waiting for device GPS**, then to **Device GPS** when Core Location supplies a fresh fix. If the fix does not arrive immediately, tap **Refresh Location**. A simulator has no real GPS position, so choosing None there leaves the app waiting until another simulated location is selected.
+To return a physical iPhone to its real position, choose **None** in Device Hub. The app continues using `CLLocationManager` on physical hardware, so the Demo screen changes its source from **Device Hub simulation** to **Device GPS** when Core Location supplies the iPhone’s real position. If the fix does not arrive immediately, tap **Refresh Location**. A simulator has no real GPS position, so choosing None there reports that no simulated location is selected.
+
+The iPhone interface identifies the source directly. A Device Hub-simulated fix uses the heading **Device Hub Location**. A real fix on a physical iPhone uses **Current Location** and the caption **Using this iPhone’s current GPS location**.
+
+When launching on an iPhone simulator, select a location for that simulator in Device Hub either before or after launch. The app requests fresh simulator location updates regularly and rejects Core Location’s retained last-known fix when it predates the current request. This lets the app change from a named scenario such as Berlin back to **No simulated location** after Device Hub changes the simulator to **None**. **None** does not mean the Mac’s current location.
 
 ## App-container demonstration
 
@@ -64,4 +68,4 @@ Latitude:  -26.2041
 Longitude:  28.0473
 ```
 
-The app identifies locations near Johannesburg, Vancouver, Banff, Denver, and Mexico City and uses known elevations for those five cities. Other simulated positions are reverse geocoded and displayed as a city and region rather than raw coordinates; their altitude comes from Core Location.
+The app immediately identifies Xcode and Device Hub’s named city scenarios: Berlin, Hong Kong, Honolulu, Johannesburg, London, Mexico City, Moscow, Mumbai, New York, Paris, Rio de Janeiro, San Francisco, Sydney, Tokyo, and Warsaw. It also recognizes Cupertino, Vancouver, Banff, and Denver. These deterministic matches avoid waiting for reverse geocoding in Simulator. Other custom positions initially display **Selected Location**, then update to a reverse-geocoded city and region when available; their altitude comes from Core Location.
