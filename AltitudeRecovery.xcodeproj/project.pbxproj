@@ -22,6 +22,7 @@
 		A1000000000000000000000D /* CardStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000D /* CardStyle.swift */; };
 		A20000000000000000000001 /* AltitudeRecoveryWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* AltitudeRecoveryWatchApp.swift */; };
 		A20000000000000000000002 /* WatchRecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* WatchRecoveryView.swift */; };
+		A20000000000000000000004 /* AltitudeRecovery Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = B20000000000000000000000 /* AltitudeRecovery Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A20000000000000000000005 /* WatchWorkoutStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000003 /* WatchWorkoutStore.swift */; };
 		A20000000000000000000006 /* WatchWorkoutsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000004 /* WatchWorkoutsView.swift */; };
 		A20000000000000000000007 /* WorkoutTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000005 /* WorkoutTransfer.swift */; };
@@ -31,7 +32,6 @@
 		A2000000000000000000000B /* WorkoutWatchSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000007 /* WorkoutWatchSync.swift */; };
 		A2000000000000000000000E /* AppSnapshotTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000009 /* AppSnapshotTransfer.swift */; };
 		A2000000000000000000000F /* AppSnapshotTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000009 /* AppSnapshotTransfer.swift */; };
-		A20000000000000000000004 /* AltitudeRecovery Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = B20000000000000000000000 /* AltitudeRecovery Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BB5A69E1300D437000A6CCED /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = BB5A69E0300D437000A6CCED /* AppIcon.icon */; };
 		BB5A69E3300D44CD00A6CCED /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB5A69E2300D44CD00A6CCED /* Launch Screen.storyboard */; };
 		BB5A69E5300D450700A6CCED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB5A69E4300D450700A6CCED /* Assets.xcassets */; };
@@ -77,7 +77,6 @@
 		B1000000000000000000000B /* AddWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddWorkoutView.swift; sourceTree = "<group>"; };
 		B1000000000000000000000C /* DemoControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoControlsView.swift; sourceTree = "<group>"; };
 		B1000000000000000000000D /* CardStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardStyle.swift; sourceTree = "<group>"; };
-		B1000000000000000000000E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B20000000000000000000000 /* AltitudeRecovery Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AltitudeRecovery Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000001 /* AltitudeRecoveryWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AltitudeRecoveryWatchApp.swift; sourceTree = "<group>"; };
 		B20000000000000000000002 /* WatchRecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRecoveryView.swift; sourceTree = "<group>"; };
@@ -117,7 +116,6 @@
 				D10000000000000000000001 /* AltitudeRecovery */,
 				D20000000000000000000001 /* AltitudeRecoveryWatch */,
 				D20000000000000000000002 /* Shared */,
-				B1000000000000000000000E /* README.md */,
 				D10000000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
